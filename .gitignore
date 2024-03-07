@@ -1,6 +1,11 @@
 .vs
 data
-Models
+models
+*.mei
+*.mid
+converter/*.jar
+converter/*.png
+converter/*.jpg
 primus_conversor
 *.semantic
 /primus_conversor/*
