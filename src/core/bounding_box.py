@@ -5,4 +5,4 @@ class BoundingBox:
         self.lower_right = lower_right
 
     def apply_on_image(self, image):
-        return image[self.upper_left[0]:self.lower_right[0], self.upper_left[1]:self.lower_right[1]]
+        return image[self.upper_left[1]:self.lower_right[1], self.upper_left[0]:self.lower_right[0]]
