@@ -122,7 +122,9 @@ dependencies = [
   "scikit-learn~=1.4.1.post1",
   "opencv-python~=4.9.0.80",
   "tensorflow~=2.15.0",
-  "numpy~=1.26.4"
+  "numpy~=1.26.4",
+  "pylsd-nova~=1.2.1",
+  "matplotlib>=3.2.2"
 ]
 
 # List additional groups of dependencies here (e.g. development
