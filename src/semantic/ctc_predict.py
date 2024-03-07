@@ -9,7 +9,7 @@
 """
 
 import tensorflow as tf
-import ctc_utils
+import semantic.ctc_utils as ctc_utils
 import cv2
 import numpy as np
 
