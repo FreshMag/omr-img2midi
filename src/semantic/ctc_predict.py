@@ -9,7 +9,7 @@
 """
 
 import tensorflow as tf
-import semantic.ctc_utils as ctc_utils
+from semantic.ctc_utils import normalize, resize, sparse_tensor_to_strs
 import cv2
 import numpy as np
 
@@ -46,8 +46,8 @@ class CTC:
 
     def predict(self, image_file_path):
         image = cv2.imread(image_file_path, cv2.IMREAD_GRAYSCALE)
-        image = ctc_utils.resize(image, self.height)
-        image = ctc_utils.normalize(image)
+        image = resize(image, self.height)
+        image = normalize(image)
         image = np.asarray(image).reshape(1, image.shape[0], image.shape[1], 1)
 
         seq_lengths = [image.shape[2] / self.width_reduction]
@@ -59,6 +59,6 @@ class CTC:
                                           self.rnn_keep_prob: 1.0,
                                       })
 
-        str_predictions = ctc_utils.sparse_tensor_to_strs(prediction)
+        str_predictions = sparse_tensor_to_strs(prediction)
 
         return str_predictions[0]
