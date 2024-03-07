@@ -1,14 +1,11 @@
 import cv2
-import numpy as np
-
 from .quadrilaterals import is_valid_quadrilateral, get_max_area_or_whole
+
 
 def get_contour(rescaled_image, min_quad_area_ratio, max_quad_angle_range):
     """
     Returns a numpy array of shape (4, 2) containing the vertices of the four corners
-    of the document in the image. It considers the corners returned from get_corners()
-    and uses heuristics to choose the four corners that most likely represent
-    the corners of the document. If no corners were found, or the four corners represent
+    of the document in the image. If no corners were found, or the four corners represent
     a quadrilateral that is too small or convex, it returns the original four corners.
     """
 
