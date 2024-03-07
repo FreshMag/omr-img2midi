@@ -65,6 +65,7 @@ def most_probable_quadrilateral(corners):
 
 def get_max_area_or_whole(contours, image_w, image_h):
     if not contours:
+        # If we didn't find valuable contours, we take the whole image as contours
         top_right = (image_w, 0)
         bottom_right = (image_w, image_h)
         bottom_left = (0, image_h)
