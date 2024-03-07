@@ -1,4 +1,4 @@
-from metrics import Metrics
+from src.util.metrics import Metrics
 
 
 class EncodedSheet:

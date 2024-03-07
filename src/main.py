@@ -1,11 +1,11 @@
-
 import argparse
 
-from ctc_predict import CTC
-from translator import SheetTranslator
-from sheet import EncodedSheet
+from post.translator import SheetTranslator
+from semantic.ctc_predict import CTC
+from semantic.sheet import EncodedSheet
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description='Decode a music score image with a trained model (CTC).')
     parser.add_argument('-image', dest='image', type=str, required=True, help='Path to the input image.')
     parser.add_argument('-model', dest='model', type=str, required=True, help='Path to the trained model.')
@@ -25,3 +25,7 @@ if __name__ == "__main__":
     translator = SheetTranslator(sheet)
     translator.translate(output_midi_path)
     print("Done!")
+
+
+if __name__ == '__main__':
+    main()
