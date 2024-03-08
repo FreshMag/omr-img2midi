@@ -44,9 +44,8 @@ class CTC:
 
         self.decoded, _ = tf.nn.ctc_greedy_decoder(logits, self.seq_len)
 
-    def predict(self, image_file_path):
-        image = cv2.imread(image_file_path, cv2.IMREAD_GRAYSCALE)
-        image = resize(image, self.height)
+    def predict(self, input_image):
+        image = resize(input_image, self.height)
         image = normalize(image)
         image = np.asarray(image).reshape(1, image.shape[0], image.shape[1], 1)
 
