@@ -1,3 +1,5 @@
+import itertools
+
 import cv2
 
 
@@ -12,34 +14,48 @@ class BoundingBox:
     def draw_on_image(self, image, color=(0, 0, 255), thickness=5):
         return cv2.rectangle(image, self.top_left, self.bottom_right, color, thickness)
 
+    def expand(self, width, height):
+        self.top_left = (max(self.top_left[0] - int(width / 2), 0), max(self.top_left[1] - int(height / 2), 0))
+        self.bottom_right = (self.bottom_right[0] + int(width / 2), self.bottom_right[1] + int(height / 2))
+        return self
+
     @staticmethod
     def from_opencv_rect(rect):
         return BoundingBox(rect[0], rect[1], rect[2], rect[3])
 
     @staticmethod
     def merge_overlapping_boxes(boxes):
-        def are_overlapping(box1, box2):
-            """
-                Check if two rectangles overlap.
+        def union(a, b):
+            x = min(a[0], b[0])
+            y = min(a[1], b[1])
+            w = max(a[0] + a[2], b[0] + b[2]) - x
+            h = max(a[1] + a[3], b[1] + b[3]) - y
+            return x, y, w, h
 
-                Parameters:
-                    box1 (tuple): First rectangle in the form (x, y, width, height).
-                    box2 (tuple): Second rectangle in the form (x, y, width, height).
+        def intersection(a, b):
+            x = max(a[0], b[0])
+            y = max(a[1], b[1])
+            w = min(a[0] + a[2], b[0] + b[2]) - x
+            h = min(a[1] + a[3], b[1] + b[3]) - y
+            if w < 0 or h < 0:
+                return ()
+            return x, y, w, h
 
-                Returns:
-                    bool: True if rectangles overlap, False otherwise.
-                """
-            x1, y1, w1, h1 = box1
-            x2, y2, w2, h2 = box2
+        rects = boxes.copy()
+        it = 0
+        while it < 100:
+            found = 0
+            for ra, rb in itertools.combinations(rects, 2):
+                if intersection(ra, rb):
+                    if ra in rects:
+                        rects.remove(ra)
+                    if rb in rects:
+                        rects.remove(rb)
+                    rects.append((union(ra, rb)))
+                    found = 1
+                    break
+            if found == 0:
+                break
+            it = it + 1
 
-            # Check if one rectangle is to the left of the other
-            if x1 + w1 < x2 or x2 + w2 < x1:
-                return False
-
-            # Check if one rectangle is above the other
-            if y1 + h1 < y2 or y2 + h2 < y1:
-                return False
-
-            return True
-
-
+        return [BoundingBox.from_opencv_rect(box) for box in rects]

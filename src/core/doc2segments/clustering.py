@@ -1,13 +1,13 @@
 import cv2
 from .bounding_box import BoundingBox
+from src.util.imgutils import show_image
 
 
-def cluster_bboxes(image, min_cluster_area=2000, min_cluster_height=50):
+def cluster_bboxes(image, min_cluster_area=2000, min_cluster_height=50, safety_margin=50):
     # Function to filter out contours with low area
     def filter_contours(cntr, min_area, min_height):
         return [contour for contour in cntr if cv2.contourArea(contour) >= min_area and
                 cv2.boundingRect(contour)[3] >= min_height]
-
 
     # Invert the image so that lines are white and background is black
     inverted_image = cv2.bitwise_not(image)
@@ -23,5 +23,8 @@ def cluster_bboxes(image, min_cluster_area=2000, min_cluster_height=50):
 
     # We then merge the overlapping bboxes
     bounding_boxes = BoundingBox.merge_overlapping_boxes(bounding_boxes)
+
+    # And expand the boxes with a safety margin
+    bounding_boxes = [bbox.expand(safety_margin, safety_margin) for bbox in bounding_boxes]
 
     return bounding_boxes
