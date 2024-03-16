@@ -139,9 +139,7 @@ class StaffRemover:
         # Remove the safety border
         result = cv2.resize(result, (512 + 100, 512 + 100))
         result = result[50:-50, 50:-50, :]
-        print("After removing safe border: {0}".format(result.shape))
         h, w, _ = result.shape
         result = result[max(border_v-1, 0):min(h-border_v+1, h), max(border_h-1, 0):min(w-border_h+1, w)]
-        print("Result shape is {0}".format(result.shape))
         print("")
         return result
