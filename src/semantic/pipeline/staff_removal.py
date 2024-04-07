@@ -124,7 +124,7 @@ class StaffRemover:
         optimal_bin_thr = 0.6
         pred_bin = (pred > optimal_bin_thr).astype(np.uint8)
         pred_bin = np.squeeze(pred_bin[0], axis=2)
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 5))
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 3))
 
         dilated = cv2.morphologyEx(pred_bin, cv2.MORPH_DILATE, kernel)
         mask = dilated == 1
