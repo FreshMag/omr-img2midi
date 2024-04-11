@@ -2,6 +2,7 @@
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
+from util import show_image
 
 
 def translate(image, x, y):
@@ -61,18 +62,20 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     return resized
 
 
-def warped2sharpened(image, blur_kernel_size=(1, 1), sharpen_weight=1.5, sharpen_blur_weight=-0.5,
-                     threshold_block_size=21, threshold_constant=15):
+def warped2sharpened(image, threshold_constant=15):
     # Convert the warped image to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Sharpen the image using un-sharp masking
-    sharpen = cv2.GaussianBlur(gray, blur_kernel_size, 0)
-    sharpen = cv2.addWeighted(gray, sharpen_weight, sharpen, sharpen_blur_weight, 0)
-
+    #sharpen = cv2.GaussianBlur(gray, blur_kernel_size, 0)
+    #sharpen = cv2.addWeighted(gray, sharpen_weight, sharpen, sharpen_blur_weight, 0)
+    blurred = cv2.GaussianBlur(gray, (1, 1), 0.2)
+    thresh = cv2.threshold(blurred, threshold_constant, 255, cv2.THRESH_OTSU)[1]
     # Apply adaptive thresholding to get black and white effect
-    thresh = cv2.adaptiveThreshold(sharpen, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,
-                                   threshold_block_size, threshold_constant)
+    #thresh = cv2.adaptiveThreshold(sharpen, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,
+    #                               threshold_block_size, threshold_constant)
+    #k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (1, 1))
+    #closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, k)
 
     return thresh
 
