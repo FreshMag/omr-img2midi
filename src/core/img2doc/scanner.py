@@ -1,4 +1,5 @@
 import cv2
+from util import show_image
 
 from . import imutils
 from . import transform
@@ -9,7 +10,7 @@ def scan(image, min_quad_area_ratio=0.25, max_quad_angle_range=40):
     """
     Scan an image by applying a perspective transformation and sharpening.
     Args:
-        image (str): image to scan
+        image (Mat): image to scan
         min_quad_area_ratio (float): A contour will be rejected if its corners
             do not form a quadrilateral that covers at least min_quad_area_ratio
             of the original image. Defaults to 0.25.
@@ -30,6 +31,6 @@ def scan(image, min_quad_area_ratio=0.25, max_quad_angle_range=40):
 
     # apply the perspective transformation
     warped = transform.four_point_transform(orig, screen_cnt * ratio)
-
     thresh = imutils.warped2sharpened(warped)
+
     return thresh
