@@ -1,3 +1,5 @@
+import warnings
+
 import cv2
 import matplotlib.pyplot as plt
 
@@ -21,7 +23,7 @@ def show_grid(images, grid_size=(3, 3)):
     total_subplots = rows * cols
 
     if num_images > total_subplots:
-        print("Warning: Not all images will be displayed. Grid size is too small.")
+        warnings.warn("Warning: Not all images will be displayed. Grid size is too small.")
 
     fig, axes = plt.subplots(rows, cols, figsize=(12, 12))
 
