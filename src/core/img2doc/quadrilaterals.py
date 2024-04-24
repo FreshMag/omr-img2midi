@@ -1,4 +1,5 @@
 import math
+import warnings
 
 import cv2
 import numpy as np
@@ -17,7 +18,10 @@ def angle_range(quad):
     The input quadrilateral must be a numpy array with vertices ordered clockwise
     starting with the top left vertex.
     """
-    top_left, top_right, bottom_right, bottom_left = quad
+    # Reshapes are necessary to ensure quad has the required shape, no matter the method used to obtain it
+    top_left, top_right, bottom_right, bottom_left = (quad[0].reshape(1, 2), quad[1].reshape(1, 2),
+                                                      quad[2].reshape(1, 2), quad[3].reshape(1, 2))
+
     ura = get_angle(top_left[0], top_right[0], bottom_right[0])
     ula = get_angle(bottom_left[0], top_left[0], top_right[0])
     lra = get_angle(top_right[0], bottom_right[0], bottom_left[0])
@@ -49,6 +53,7 @@ def get_angle(p1, p2, p3):
 
 
 def get_max_area_or_whole(contours, image_w, image_h):
+    flag = False
     if not contours:
         # If we didn't find valuable contours, we take the whole image as contours
         top_right = (image_w, 0)
@@ -58,5 +63,5 @@ def get_max_area_or_whole(contours, image_w, image_h):
         cnt = np.array([[top_right], [bottom_right], [bottom_left], [top_left]])
     else:
         cnt = max(contours, key=cv2.contourArea)
-
-    return cnt.reshape(4, 2)
+        flag = True
+    return cnt.reshape(4, 2), flag
