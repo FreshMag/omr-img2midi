@@ -2,15 +2,13 @@ import warnings
 
 import cv2
 import numpy as np
-from util import show_image
 
 from .clustering import cluster_bboxes
 
 
 def segment_doc(doc):
-    total_area = doc.shape[0] * doc.shape[1]
-    segments = [bbox.apply_on_image(doc) for bbox in cluster_bboxes(doc, min_cluster_area=total_area / 300)]
-    return split_segments(segments)
+    segments = [bbox.apply_on_image(doc) for bbox in cluster_bboxes(doc)]
+    return list(reversed(segments))
 
 
 def optimal_half_split(segment, threshold=0.1):
@@ -39,7 +37,6 @@ def optimal_half_split(segment, threshold=0.1):
 
     if optimal_x <= 0 or optimal_x >= width - 1:
         warnings.warn("Optimal half split is not possible")
-        show_image(bin_segment)
     # else:
     #show_image(cv2.line(bin_segment, (optimal_x, 0), (optimal_x, segment.shape[0]), (255, 0, 0), 2))
     left_part = segment[:, :optimal_x]
@@ -71,9 +68,16 @@ def unsharpen(image):
     return cv2.GaussianBlur(image, (1, 1), 0.25)
 
 
+def show_image(image):
+    cv2.imshow("Test", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
 def split_segments(segments):
     splitted = []
     for segment in segments:
+        #show_image(segment)
         shape = segment.shape
         if len(shape) != 2:
             raise ValueError(f"Segment shape {shape} does not have 2 dimensions. Please provide grayscale 2D segments")
@@ -84,8 +88,8 @@ def split_segments(segments):
         seg1, seg2 = optimal_half_split(segment)
         if is_binary(segment):
             seg1, seg2 = (unsharpen(add_safety_border(smallest_boxed(seg1))), unsharpen(add_safety_border(smallest_boxed(seg2))))
-        splitted.append(seg1)
         splitted.append(seg2)
+        splitted.append(seg1)
         #show_image(seg1)
         #show_image(seg2)
     return splitted
