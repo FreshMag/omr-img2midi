@@ -1,7 +1,7 @@
 import os
-
-from util.metrics import Metrics
 import warnings
+
+from src.semantic.parser import parse
 
 
 class EncodedSheet:
@@ -49,8 +49,9 @@ class EncodedSheet:
                 if self.int2word is None:
                     raise ValueError("Vocabulary must be set in order to import symbols!")
 
-                for symbol in semantic_file.read().split(separator):
-                    matching_values = list(self.int2word.keys())[list(self.int2word.values()).index(symbol)]
+                symbols = parse(semantic_file.read())
+                for symbol in symbols:
+                    matching_values = list(self.int2word.keys())[list(self.int2word.values()).index(symbol["text"])]
                     self.output_indexes.append(matching_values)
                     self.output_symbols.append(symbol)
             else:
@@ -63,11 +64,6 @@ class EncodedSheet:
             self.output_indexes.append(symbol_index)
             if self.int2word is not None:
                 self.output_symbols.append(self.int2word[symbol_index])
-
-    def compare(self, true_sheet):
-        metrics = Metrics()
-        metrics.compute_from_semantics(self.output_indexes, true_sheet.output_indexes)
-        return metrics
 
     def print_symbols(self, separator=" "):
         def print_list(to_print):
