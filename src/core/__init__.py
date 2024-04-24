@@ -1,2 +1,2 @@
-from src.core.doc2segments.bounding_box import BoundingBox
-import img2doc
+from .doc2segments.segmentation import segment_doc
+from .img2doc.scanner import scan

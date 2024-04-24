@@ -1,2 +1,2 @@
 from .sheet import EncodedSheet
-from .ctc_predict import CTC
+from src.semantic.end2end.ctc_predict import CTC
