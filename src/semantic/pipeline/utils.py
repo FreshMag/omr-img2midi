@@ -31,5 +31,4 @@ def reassemble_image(chunks, width, height, chunk_size):
         assembled_image = np.hstack((assembled_image, column))
         i += rows
 
-
     return assembled_image
