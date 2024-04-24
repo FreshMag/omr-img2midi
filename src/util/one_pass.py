@@ -1,3 +1,4 @@
+import cv2
 from semantic import CTC, EncodedSheet
 
 
@@ -14,5 +15,7 @@ def end2end_recognition(segments, model, vocabulary_path=None):
         subsheet.add_from_predictions(predictions)
         subsheets.append(subsheet)
     return sheet, subsheets
+
+
 
 
