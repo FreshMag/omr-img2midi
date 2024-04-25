@@ -8,7 +8,7 @@ from .clustering import cluster_bboxes
 
 def segment_doc(doc):
     segments = [bbox.apply_on_image(doc) for bbox in cluster_bboxes(doc)]
-    return list(reversed(segments))
+    return list(reversed(split_segments(segments)))
 
 
 def optimal_half_split(segment, threshold=0.1):
