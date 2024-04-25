@@ -75,7 +75,7 @@ class EncodedSheet:
         else:
             print_list(self.output_symbols)
 
-    def write_to_file(self, filename, output_format="symbol"):
+    def write_to_file(self, filename, output_format="symbol", separator='\n'):
         to_write = []
         if output_format == "symbol":
             to_write = self.output_symbols
@@ -86,5 +86,5 @@ class EncodedSheet:
 
         with open(filename, 'w') as file:
             for value in to_write:
-                file.write(str(value) + '\t')  # Separating values by "\t"
+                file.write(str(value) + separator)
             file.write('\n')  # Adding a newline at the end
