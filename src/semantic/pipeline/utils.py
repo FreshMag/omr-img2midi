@@ -1,7 +1,4 @@
-import math
-
 import numpy as np
-from util.imgutils import show_image
 
 
 def divide_in_chunks(image, chunk_size=512):
