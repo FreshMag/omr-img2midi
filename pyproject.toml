@@ -124,7 +124,7 @@ dependencies = [
   "tensorflow~=2.15.0",
   "numpy~=1.26.4",
   "pylsd-nova~=1.2.1",
-  "matplotlib>=3.2.2",
+  "matplotlib>=3.7.1",
   "tqdm"
 ]
 
