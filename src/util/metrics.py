@@ -84,78 +84,13 @@ def get_test_set(directory, filter_files=None):
     return test_set
 
 
-def test_set_with_metrics(directory="./", vocabulary_file_path="../../data/vocabulary_semantic.txt",
-                          model_path="../../models/semantic/semantic_model.meta"):
-    test_set = get_test_set(directory, lambda x: "various" in x)
+def show_image(img, title="Title"):
+    cv2.imshow(title, img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    model = CTC(model_path)
 
-    def img2sheet(image_path, to_scan=True, to_print=True):
-        print("Reading %s" % image_path)
-        img = cv2.imread(image_path, cv2.IMREAD_COLOR)
-        if to_scan:
-            img = scan(img, thresh_block_size=41, thresh_c=30)
-            nlabels, labels, stats, centroids = cv2.connectedComponentsWithStats(cv2.bitwise_not(img), None, None, None, 8,
-                                                                                 cv2.CV_32S)
-
-            # get CC_STAT_AREA component as stats[label, COLUMN]
-            areas = stats[1:, cv2.CC_STAT_AREA]
-
-            img = np.zeros(labels.shape, np.uint8)
-            pixel_thresh = img.shape[0] * img.shape[1] * 0.000025
-            for i in range(0, nlabels - 1):
-                if areas[i] >= pixel_thresh:  # keep
-                    img[labels == i + 1] = 255
-            img = cv2.bitwise_not(img)
-        else:
-            img = light_scan(img)
-        if to_print:
-            cv2.imshow(image_path, img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-        segments = segment_doc(img)
-        sheet, _ = end2end_recognition(segments, model=model, vocabulary_path=vocabulary_file_path)
-        return sheet
-
-    cameras = ["front"]  #, "left", "right", "top", "bottom"]
-    backgrounds = ["normal", "dark", "shadow"]
-    quality = ["-hd"] # , ""]
-    conditions = [comb[0] + comb[1] + comb[2] for comb in itertools.product(cameras, backgrounds, quality)]
-    results = {}
-
-    for name in tqdm(test_set.keys()):
-        case = test_set[name]
-        true = EncodedSheet(vocabulary_file_path=vocabulary_file_path)
-        try:
-            true.add_from_semantic_file(case["ref"], file_format="symbol", separator="\n")
-        except Exception as e:
-            print(e)
-            warnings.warn(f"Ignoring %s because of empty reference file for ref: %s" % (name, case["ref"]))
-            continue
-
-        results[name] = {}
-        # print("==== Calculating %s %s" % (name, "scan"))
-        # print("==== Reference file: %s" % case["ref"])
-        scanned = img2sheet(case["scan"], to_scan=False)
-        results[name]["ref-scan-jaccard"] = jaccard_index(true.output_indexes, scanned.output_indexes)
-        results[name]["ref-scan-symbolerror"] = symbol_error_rate(true.output_indexes, scanned.output_indexes)
-
-        for condition in tqdm(case.keys()):
-            if condition in conditions:
-                # print("==== Calculating %s %s" % (name, condition))
-                # print("==== Reference file: %s" % case["ref"])
-
-                computed_sheet = img2sheet(case[condition], to_scan=True)
-                results[name]["ref-" + condition + "-jaccard"] = jaccard_index(true.output_indexes,
-                                                                               computed_sheet.output_indexes)
-                # print("==== Comparing with Scan image: %s" % case["scan"])
-                results[name]["scan-" + condition + "-jaccard"] = jaccard_index(scanned.output_indexes,
-                                                                                computed_sheet.output_indexes)
-                results[name]["ref-" + condition + "-symbolerror"] = symbol_error_rate(true.output_indexes,
-                                                                                       computed_sheet.output_indexes)
-                results[name]["scan-" + condition + "-symbolerror"] = symbol_error_rate(scanned.output_indexes,
-                                                                                        computed_sheet.output_indexes)
-
+def print_statistics(results, conditions):
     to_tabulate = []
     # print(results)
     for name in results:
@@ -173,11 +108,14 @@ def test_set_with_metrics(directory="./", vocabulary_file_path="../../data/vocab
                                                   "Jaccard Index(with scanned)", "Symbol Error Rate(with reference)",
                                                   "Symbol Error Rate(with scanned)"], tablefmt="fancy_grid"))
 
+
+def print_means(results, backgrounds, log=lambda x: print(x)):
     print("\nComputing means")
     backgrounds.append("scan")
     sums_jaccard = np.zeros(len(backgrounds))
-    counts = np.zeros(len(backgrounds))
+    counts_jaccard = np.zeros(len(backgrounds))
     sums_symbolerror = np.zeros(len(backgrounds))
+    counts_symbolerror = np.zeros(len(backgrounds))
 
     for name in results:
         for condition in filter(lambda x: "ref" in x, results[name].keys()):
@@ -192,20 +130,126 @@ def test_set_with_metrics(directory="./", vocabulary_file_path="../../data/vocab
                 if back in c:
                     if metric == "jaccard":
                         sums_jaccard[i] = sums_jaccard[i] + results[name][condition]
-                        counts[i] = counts[i] + 1
+                        counts_jaccard[i] = counts_jaccard[i] + 1
                     elif metric == "symbolerror":
                         sums_symbolerror[i] = sums_symbolerror[i] + results[name][condition]
-                        counts[i] = counts[i] + 1
+                        counts_symbolerror[i] = counts_symbolerror[i] + 1
 
     to_tabulate = []
     for i in range(len(backgrounds)):
-        to_tabulate.append([backgrounds[i], float(sums_jaccard[i]) / counts[i], float(sums_symbolerror[i]) / counts[i]])
+        to_tabulate.append([backgrounds[i], float(sums_jaccard[i]) / (counts_jaccard[i]),
+                            float(sums_symbolerror[i]) / counts_symbolerror[i]])
 
-    print(tabulate.tabulate(to_tabulate,
-                            headers=["Background", "Jaccard Index(with reference)",
-                                     "Symbol Error Rate(with reference)"],
-                            tablefmt="fancy_grid"))
+    log(tabulate.tabulate(to_tabulate,
+                          headers=["Background", "Jaccard Index(with reference)",
+                                   "Symbol Error Rate(with reference)"],
+                          tablefmt="fancy_grid"))
+    return to_tabulate
+
+
+def test_set_with_metrics(parameters, directory="./", vocabulary_file_path="../../data/vocabulary_semantic.txt",
+                          model_path="../../models/semantic/semantic_model.meta"):
+    test_set = get_test_set(directory, filter_files=lambda x: "bona122" not in x and "bona90" not in x)
+
+    model = CTC(model_path)
+
+    def img2sheet(image_path, to_scan=True, to_print=False):
+        print("Reading %s" % image_path)
+        img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        h, w, _ = img.shape
+        if to_scan:
+            img = scan(img,
+                       thresh_block_size_ratio=parameters["thresh_block_ratio"],
+                       thresh_c_ratio=parameters["thresh_c_ratio"],
+                       component_pixel_thresh_ratio=parameters["component_thresh_ratio"])
+        else:
+            img = light_scan(img)
+        if to_print:
+            cv2.imshow(image_path, img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        segments = segment_doc(img)
+        #for segment in segments:
+        #show_image(segment)
+        sheet, _ = end2end_recognition(segments, model=model, vocabulary_path=vocabulary_file_path)
+        return sheet
+
+    cameras = ["front", "left", "right", "top", "bottom"]
+    backgrounds = ["normal", "shadow"]  # , "dark"]
+    quality = ["-hd"]
+    conditions = [comb[0] + comb[1] + comb[2] for comb in itertools.product(cameras, backgrounds, quality)]
+    results = {}
+
+    for name in tqdm(test_set.keys()):
+        case = test_set[name]
+        true = EncodedSheet(vocabulary_file_path=vocabulary_file_path)
+        try:
+            true.add_from_semantic_file(case["ref"], file_format="symbol", separator="\n")
+        except Exception as e:
+            print(e)
+            warnings.warn(f"Ignoring %s because of empty reference file for ref: %s" % (name, case["ref"]))
+            continue
+
+        results[name] = {}
+        # print("==== Calculating %s %s" % (name, "scan"))
+        # print("==== Reference file: %s" % case["ref"])
+        scanned = img2sheet(case["scan"], to_scan=False)
+        # scanned.write_to_file("../../data/output/%s.txt" % (os.path.basename(case["scan"])), output_format="symbol")
+        results[name]["ref-scan-jaccard"] = jaccard_index(true.output_indexes, scanned.output_indexes)
+        results[name]["ref-scan-symbolerror"] = symbol_error_rate(true.output_indexes, scanned.output_indexes)
+
+        for condition in tqdm(case.keys()):
+            if condition in conditions:
+                # print("==== Calculating %s %s" % (name, condition))
+                # print("==== Reference file: %s" % case["ref"])
+
+                computed_sheet = img2sheet(case[condition], to_scan=True)
+                # computed_sheet.write_to_file("../../data/output/%s.txt" % (os.path.basename(case[condition])), output_format="symbol")
+                results[name]["ref-" + condition + "-jaccard"] = jaccard_index(true.output_indexes,
+                                                                               computed_sheet.output_indexes)
+                # print("==== Comparing with Scan image: %s" % case["scan"])
+                results[name]["scan-" + condition + "-jaccard"] = jaccard_index(scanned.output_indexes,
+                                                                                computed_sheet.output_indexes)
+                results[name]["ref-" + condition + "-symbolerror"] = symbol_error_rate(true.output_indexes,
+                                                                                       computed_sheet.output_indexes)
+                results[name]["scan-" + condition + "-symbolerror"] = symbol_error_rate(scanned.output_indexes,
+                                                                                        computed_sheet.output_indexes)
+
+    print_statistics(results, conditions)
+
+    return print_means(results, backgrounds)
+
+
+def optimization():
+    search_space = {"component_thresh_ratio": [0.00001, 0.000015], "thresh_block_ratio": [0.01224, 0.01356, 0.01488],
+                    "thresh_c_ratio": [0.0033, 0.0066, 0.0099]}
+    optimal = None
+    min_error = float('inf')
+
+    for component_thresh in search_space["component_thresh_ratio"]:
+        for thresh_size in search_space["thresh_block_ratio"]:
+            for thresh_c in search_space["thresh_c_ratio"]:
+                param = {"component_thresh_ratio": component_thresh,
+                         "thresh_block_ratio": thresh_size,
+                         "thresh_c_ratio": thresh_c}
+                print("Testing %s" % param)
+                result = test_set_with_metrics(parameters=param, directory="../../data/input/test/")
+                means_symbol_error = np.array(result)[:, 2:]
+                means_symbol_error[means_symbol_error == ''] = 0.0
+                means_symbol_error = means_symbol_error.astype(np.float32)
+                error_sum = np.sum(means_symbol_error)
+
+                if error_sum < min_error:
+                    min_error = error_sum
+                    optimal = param
+
+    print("Optimal: %s" % optimal)
+    print("Min. error: %f" % min_error)
 
 
 if __name__ == "__main__":
-    test_set_with_metrics(directory="../../data/input/test/")
+    # optimization()
+    test_set_with_metrics(parameters={'component_thresh_ratio': 2e-05,
+                                      'thresh_block_ratio': 0.018,
+                                      'thresh_c_ratio': 0.0050},
+                          directory="../../data/input/test/")
