@@ -5,6 +5,16 @@ from .bounding_box import BoundingBox
 
 def cluster_bboxes(image, min_cluster_area_ratio=0.005, min_cluster_height_ratio=0.03, safety_margin_ratio=0.03,
                    max_cluster_area_ratio=0.25, max_cluster_height_ratio=0.25):
+    """
+    Clusters the contours of the image, producing rectangular bounding boxes already merged with Non-Maxima suppression
+    :param image: Image to be clustered
+    :param min_cluster_area_ratio: Percentage of the minimum area of the image to be considered a cluster
+    :param min_cluster_height_ratio: Percentage of the minimum height of the image to be considered a cluster
+    :param safety_margin_ratio: Percentage of the area of the image to added as safety margin
+    :param max_cluster_area_ratio: Percentage of the maximum area of the image to be considered a cluster
+    :param max_cluster_height_ratio: Percentage of the maximum height of the image to be considered a cluster
+    :return: Bounding boxes merged with Non-Maxima suppression
+    """
     # Function to filter out contours with low area
     def filter_contours(cntr, min_area, min_height, max_area, max_height):
         return [contour for contour in cntr if

@@ -4,7 +4,8 @@ from core.img2doc import imutils, transform
 from core.img2doc.contours import approx_contours, harris
 
 
-def scan(image, min_quad_area_ratio=0.25, max_quad_angle_range=40, warp=True, thresh_block_size=21, thresh_c=15):
+def scan(image, min_quad_area_ratio=0.25, max_quad_angle_range=40, warp=True, thresh_block_size_ratio=0.018,
+         thresh_c_ratio=0.0050, component_pixel_thresh_ratio=6e-05):
     """
     Scan an image by applying a perspective transformation and sharpening.
     Args:
@@ -14,7 +15,11 @@ def scan(image, min_quad_area_ratio=0.25, max_quad_angle_range=40, warp=True, th
             of the original image. Defaults to 0.25.
         max_quad_angle_range (int):  A contour will also be rejected if the range
             of its interior angles exceeds max_quad_angle_range. Defaults to 40.
-    :param close_kernel:
+    :param thresh_block_size_ratio:
+    :param thresh_c_ratio:
+    :param component_pixel_thresh_ratio:
+    :param max_quad_angle_range:
+    :param min_quad_area_ratio:
     :param warp:
     :return image (np.ndarray):
     """
@@ -42,10 +47,25 @@ def scan(image, min_quad_area_ratio=0.25, max_quad_angle_range=40, warp=True, th
         warped = transform.four_point_transform(orig, quad * ratio)
     else:
         warped = image.copy()
-    thresh = imutils.warped2sharpened(warped, thresh_block_size=thresh_block_size, thresh_c=thresh_c)
 
-    return thresh
+    def round_up_to_odd(f):
+        return int(np.ceil(f) // 2 * 2 + 1)
+    h, w, _ = warped.shape
+    thresh = imutils.warped2sharpened(warped, thresh_block_size=round_up_to_odd(thresh_block_size_ratio * w),
+                                      thresh_c=int(thresh_c_ratio * w))
+    nlabels, labels, stats, _ = cv2.connectedComponentsWithStats(cv2.bitwise_not(thresh), None, None,
+                                                                 None, 8, cv2.CV_32S)
 
+    # get CC_STAT_AREA component as stats[label, COLUMN]
+    areas = stats[1:, cv2.CC_STAT_AREA]
+
+    final_image = np.zeros(labels.shape, np.uint8)
+    component_pixel_thresh = ((h * w) - cv2.countNonZero(thresh)) * component_pixel_thresh_ratio
+    for i in range(0, nlabels - 1):
+        if areas[i] >= component_pixel_thresh:  # keep
+            final_image[labels == i + 1] = 255
+    final_image = cv2.bitwise_not(final_image)
+    return final_image
 
 def light_scan(image):
     assert (image is not None)
