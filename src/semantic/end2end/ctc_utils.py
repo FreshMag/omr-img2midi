@@ -1,3 +1,9 @@
+"""
+This file contains a collection of utility functions used by ctc_predict.py
+
+All the code here was developed by Jorge Calvo Zaragoza <https://github.com/calvozaragoza> and can be found also
+on the original GitHub repository <https://github.com/OMR-Research/tf-end-to-end>
+"""
 import cv2
 
 

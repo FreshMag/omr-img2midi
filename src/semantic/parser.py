@@ -1,3 +1,9 @@
+"""
+
+The following functions and class are used to parse a semantic file. They are not core to this project, so code and
+documentation could be imprecise or suboptimal.
+
+"""
 from antlr4 import *
 
 from .compiler.semanticLexer import semanticLexer

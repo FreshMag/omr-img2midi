@@ -22,7 +22,14 @@ tf.compat.v1.disable_eager_execution()
 
 
 class CTC:
+    """
+    Class used to encapsulate the CTC model, originally developed by Jorge Calvo Zaragoza
+    """
     def __init__(self, model_file_path="./models/semantic/semantic_model.meta"):
+        """
+        Initialises the model.
+        :param model_file_path: path to the model file
+        """
         tf.compat.v1.reset_default_graph()
         self.session = tf.compat.v1.InteractiveSession()
 
@@ -45,6 +52,11 @@ class CTC:
         self.decoded, _ = tf.nn.ctc_greedy_decoder(logits, self.seq_len)
 
     def predict(self, input_image):
+        """
+        Main function of CTC. It predicts the list of semantic symbols outputting their indexes, related to a vocabulary
+        :param input_image: image to be predicted by the model
+        :return: the obtained predictions
+        """
         image = resize(input_image, self.height)
         image = normalize(image)
         image = np.asarray(image).reshape(1, image.shape[0], image.shape[1], 1)
