@@ -1,0 +1,7 @@
+T__0=1
+COMMENT=2
+STRING=3
+DASH=4
+WHITESPACE=5
+'_'=1
+'-'=4
