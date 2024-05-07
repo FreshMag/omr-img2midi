@@ -1,10 +1,14 @@
-# import the necessary packages
 from scipy.spatial import distance as dist
 import numpy as np
 import cv2
 
 
 def order_points(pts):
+    """
+    Sorts points to be used by other functions
+    :param pts: array of points
+    :return: an array of sorted points [(x1, y1), (x2, y2), ...] representing the four corners
+    """
     # sort the points based on their x-coordinates
     x_sorted = pts[np.argsort(pts[:, 0]), :]
     # grab the left-most and right-most points from the sorted
@@ -31,6 +35,12 @@ def order_points(pts):
 
 
 def get_max_distance(axis1, axis2):
+    """
+    Calculates the maximum distance between two axis
+    :param axis1: first axis, tuple of 2 points
+    :param axis2: second axis, tuple of 2 points
+    :return: the maximum distance between axis1 and axis2
+    """
     pt1, pt2 = axis1
     pt3, pt4 = axis2
     dim1 = dist.euclidean(pt1, pt2)
@@ -39,6 +49,11 @@ def get_max_distance(axis1, axis2):
 
 
 def get_containing_dims(quad):
+    """
+    Finds the containing dimensions of a quadrilateral
+    :param quad: to be contained
+    :return: a tuple with (max_width, max_height)
+    """
     (top_left, top_right, bottom_right, bottom_left) = quad
 
     max_width = get_max_distance((bottom_right, bottom_left), (top_right, top_left))
@@ -48,16 +63,19 @@ def get_containing_dims(quad):
 
 
 def four_point_transform(image, pts):
+    """
+    Warps the image to gain a frontal view of the document, using the four corners of the previously detected
+    quadrilateral
+    :param image: image to be transformed
+    :param pts: array of points, representing the four corners
+    :return: the warped image
+    """
     # obtain a consistent order of the points and unpack them
     # individually
     quad = order_points(pts)
 
     new_width, new_height = get_containing_dims(quad)
-    # now that we have the dimensions of the new image, construct
-    # the set of destination points to obtain a "birds eye view",
-    # (i.e. top-down view) of the image, again specifying points
-    # in the top-left, top-right, bottom-right, and bottom-left
-    # order
+
     dst = np.array([
         [0, 0],
         [new_width - 1, 0],
@@ -65,8 +83,8 @@ def four_point_transform(image, pts):
         [0, new_height - 1]], dtype="float32")
 
     # compute the perspective transform matrix and then apply it
-    M = cv2.getPerspectiveTransform(quad, dst)
-    warped = cv2.warpPerspective(image, M, (new_width, new_height))
+    m = cv2.getPerspectiveTransform(quad, dst)
+    warped = cv2.warpPerspective(image, m, (new_width, new_height))
 
     # return the warped image
     return warped
