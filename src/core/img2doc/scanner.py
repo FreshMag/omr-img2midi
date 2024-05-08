@@ -30,11 +30,11 @@ def scan(image, min_quad_area_ratio=0.25, max_quad_angle_range=40, warp=True, th
     else:
         warped = image.copy()
 
-    final_image = clean_image(component_pixel_thresh_ratio, thresh_block_size_ratio, thresh_c_ratio, warped)
+    final_image = clean_image(warped, component_pixel_thresh_ratio, thresh_block_size_ratio, thresh_c_ratio)
     return final_image
 
 
-def clean_image(component_pixel_thresh_ratio, thresh_block_size_ratio, thresh_c_ratio, warped):
+def clean_image(warped, component_pixel_thresh_ratio, thresh_block_size_ratio, thresh_c_ratio):
     """
     Internal function used by ``scan()`` to clean the image after warping. See ``scan()`` for details.
     :return: the cleaned image
