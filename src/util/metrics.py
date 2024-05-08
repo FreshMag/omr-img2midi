@@ -1,3 +1,9 @@
+"""
+
+This file contains a series of calculations to evaluate metrics. It has also been used to obtain optimal parameters
+for the various algorithms. Here documentation and code are incomplete and are not be considered core of the project.
+
+"""
 import glob
 import itertools
 import os
