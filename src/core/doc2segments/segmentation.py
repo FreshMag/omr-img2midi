@@ -22,8 +22,7 @@ def optimal_half_split(segment, threshold=0.1):
     This function finds the optimal half split of a segment. Optimal is defined as the vertical line that encounters the
     minimum number of black pixel (music symbol) as near as possible to the center of the segment.
     :param segment: The segment that needs to be split
-    :param threshold: A value used as threshold to determine if the split is optimal. It is multiplied for the height of
-    the segment
+    :param threshold: A value used as threshold to determine if the split is optimal. It is multiplied for the height of the segment
     :return: Two images, left and right side of the segment respect to the found optimal split
     """
     pixel_threshold = threshold * (segment.shape[0] * 10)

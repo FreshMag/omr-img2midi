@@ -22,8 +22,7 @@ def harris_quad(image):
     """
     This function finds the most probable quadrilateral inside the photograph using Harris corner detection.
     :param image: photo of the sheet
-    :return: an array of four points (y, x), top_left, top_right, bottom_right and bottom_left in this order, corners of
-    the found quadrilateral
+    :return: an array of four points (y, x), top_left, top_right, bottom_right and bottom_left in this order, corners of the found quadrilateral
     """
     img = image.copy()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -49,13 +48,10 @@ def harris_quad(image):
 
 def harris(rescaled_image, min_quad_area_ratio, max_quad_angle_range):
     """
-    Uses the ``harris_quad`` function internally to find the most probable quadrilateral with Harris corner
-    detection.
+    Uses the ``harris_quad`` function internally to find the most probable quadrilateral with Harris corner detection.
     :param rescaled_image: the rescaled image
-    :param min_quad_area_ratio: the ratio, respectively to the
-    size of the image, to which the quadrilateral's area is considered to be valid (otherwise it would be too small)
-    :param max_quad_angle_range: the range of the angles inside the quadrilateral inside which the quadrilateral is
-    considered to be valid (otherwise it would be too convex)
+    :param min_quad_area_ratio: the ratio, respectively to the size of the image, to which the quadrilateral's area is considered to be valid (otherwise it would be too small)
+    :param max_quad_angle_range: the range of the angles inside the quadrilateral inside which the quadrilateral is considered to be valid (otherwise it would be too convex)
     :return: the rectangle and ``true`` is the found quadrilateral is valid, None and ``false`` if not
     """
     image_h, image_w, _ = rescaled_image.shape
@@ -72,13 +68,9 @@ def approx_contours(rescaled_image, min_quad_area_ratio, max_quad_angle_range):
     however being more sensitive to imperfections in the sheet's shape. If this fails, it is better to try ``harris``
     instead
     :param rescaled_image: the rescaled image
-    :param min_quad_area_ratio: the ratio, respectively to the
-    size of the image, to which the quadrilateral's area is considered to be valid (otherwise it would be too small)
-    :param max_quad_angle_range: the range of the angles inside the quadrilateral inside which the quadrilateral is
-    considered to be valid (otherwise it would be too convex)
-    :return: a numpy array of shape (4, 2) containing the vertices of the four corners
-    of the document in the image. If no corners were found, or the four corners represent
-    a quadrilateral that is too small or convex, it returns the original four corners
+    :param min_quad_area_ratio: the ratio, respectively to the size of the image, to which the quadrilateral's area is considered to be valid (otherwise it would be too small)
+    :param max_quad_angle_range: the range of the angles inside the quadrilateral inside which the quadrilateral is considered to be valid (otherwise it would be too convex)
+    :return: a numpy array of shape (4, 2) containing the vertices of the four corners of the document in the image. If no corners were found, or the four corners represent a quadrilateral that is too small or convex, it returns the original four corners
     """
     image_h, image_w, _ = rescaled_image.shape
 

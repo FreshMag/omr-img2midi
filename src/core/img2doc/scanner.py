@@ -9,15 +9,12 @@ def scan(image, min_quad_area_ratio=0.25, max_quad_angle_range=40, warp=True, th
     """
     Scan an image by applying a perspective transformation and sharpening.
     :param image: image to be scanned, usually a photo of the document
-    :param min_quad_area_ratio: percentage of the total area of the image to be considered valid for a quadrilateral
-    containing the document sheet
-    :param max_quad_angle_range: internal angles range considered valid for a quadrilateral containing the
-    document sheet
+    :param min_quad_area_ratio: percentage of the total area of the image to be considered valid for a quadrilateral containing the document sheet
+    :param max_quad_angle_range: internal angles range considered valid for a quadrilateral containing the document sheet
     :param warp (boolean) whether to warp the image or not
     :param thresh_block_size_ratio: percentage of the width of the image to be used as block size in the thresholding
     :param thresh_c_ratio: percentage of the width of the image to be used as constant in the thresholding
-    :param component_pixel_thresh_ratio: percentage of the area of the image to be used as thresh for connected
-    components pixel number
+    :param component_pixel_thresh_ratio: percentage of the area of the image to be used as thresh for connected components pixel number
     :return: the scanned image
     """
     rescaled_height = 500.0

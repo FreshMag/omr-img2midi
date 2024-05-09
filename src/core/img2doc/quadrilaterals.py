@@ -72,8 +72,7 @@ def get_max_area_or_whole(contours, image_w, image_h):
     :param contours: the already filtered contours
     :param image_w: width of the image
     :param image_h: height of the image
-    :return: a 2D numpy array [[x1,y1], [x2, y2], ...] with the four vertexes of the quadrilateral and a flag that is
-    ``True`` if a valid contour was found, ``False`` otherwise
+    :return: a 2D numpy array [[x1,y1], [x2, y2], ...] with the four vertexes of the quadrilateral and a flag that is ``True`` if a valid contour was found, ``False`` otherwise
     """
     flag = False
     if not contours:
