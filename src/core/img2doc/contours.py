@@ -3,6 +3,9 @@ import cv2
 import numpy as np
 from core.img2doc.quadrilaterals import is_valid_quadrilateral, get_max_area_or_whole
 
+EPS_SEARCH_SPACE = np.linspace(0.001, 0.05, 10)
+THRESH_MAX: int = 84
+
 
 def draw_points(image, points):
     """
@@ -34,13 +37,14 @@ def harris_quad(image):
 
     h, w = gray.shape
     true_indices = np.argwhere(mask)
-    if len(true_indices) == 0:
-        return [[h-1, w-1], [h-1, 0], [0, 0], [0, w-1]]
+    # if we found less than 4 corners, we can't form a quadrilateral
+    if len(true_indices) < 4:
+        return [[h - 1, w - 1], [h - 1, 0], [0, 0], [0, w - 1]]
 
     top_left = true_indices[np.argmin([math.dist(p, (0, 0)) for p in true_indices])]
-    top_right = true_indices[np.argmin([math.dist(p, (0, w-1)) for p in true_indices])]
-    bottom_right = true_indices[np.argmin([math.dist(p, (h-1, w-1)) for p in true_indices])]
-    bottom_left = true_indices[np.argmin([math.dist(p, (h-1, 0)) for p in true_indices])]
+    top_right = true_indices[np.argmin([math.dist(p, (0, w - 1)) for p in true_indices])]
+    bottom_right = true_indices[np.argmin([math.dist(p, (h - 1, w - 1)) for p in true_indices])]
+    bottom_left = true_indices[np.argmin([math.dist(p, (h - 1, 0)) for p in true_indices])]
 
     corners = np.array([top_left, top_right, bottom_right, bottom_left])
     return corners
@@ -77,7 +81,7 @@ def approx_contours(rescaled_image, min_quad_area_ratio, max_quad_angle_range):
     found = False
     it = 0
     max_it = 5
-    thresh = range(84 - max_it, 84)
+    thresh = range(THRESH_MAX - max_it, THRESH_MAX)
     final_contour = None
     # We try different threshes until we either find the quadrilateral or we reach a maximum number of iterations
     while not found and it < max_it:
@@ -90,8 +94,8 @@ def approx_contours(rescaled_image, min_quad_area_ratio, max_quad_angle_range):
         for c in contours:
             # approximate the contour
             peri = cv2.arcLength(c, True)
-            for eps in np.linspace(0.001, 0.05, 10):
-                approx_quad = cv2.approxPolyDP(c, eps * peri, True)
+            for eps in EPS_SEARCH_SPACE:
+                approx_quad = cv2.approxPolyDP(c, eps *  ri, True)
                 if is_valid_quadrilateral(approx_quad, image_w, image_h, min_quad_area_ratio, max_quad_angle_range):
                     found = True
                     approximated.append(approx_quad)
