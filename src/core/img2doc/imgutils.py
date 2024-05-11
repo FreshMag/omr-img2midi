@@ -95,7 +95,7 @@ def warped2sharpened(image, thresh_block_size, thresh_c):
 
 def show_contours(image, contours, corners):
     """
-    Utility function to show contours
+    Utility function to show contors
     :param image: to be drawn on
     :param contours: to be drawn
     :param corners: corners to highlight

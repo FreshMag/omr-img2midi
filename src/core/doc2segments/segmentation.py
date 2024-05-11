@@ -11,7 +11,7 @@ def segment_doc(doc):
     The main function of doc2segments. It takes a document scanned with img2doc and returns the list of segments
     inside the doc
     :param doc: The scanned document
-    :return: The list of segments, sorted according to theie position in the music sheet
+    :return: The list of segments, sorted according to their position in the music sheet
     """
     segments = [bbox.apply_on_image(doc) for bbox in cluster_bboxes(doc)]
     return list(reversed(split_segments(segments)))
