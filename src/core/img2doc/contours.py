@@ -95,7 +95,7 @@ def approx_contours(rescaled_image, min_quad_area_ratio, max_quad_angle_range):
             # approximate the contour
             peri = cv2.arcLength(c, True)
             for eps in EPS_SEARCH_SPACE:
-                approx_quad = cv2.approxPolyDP(c, eps *  ri, True)
+                approx_quad = cv2.approxPolyDP(c, eps * peri, True)
                 if is_valid_quadrilateral(approx_quad, image_w, image_h, min_quad_area_ratio, max_quad_angle_range):
                     found = True
                     approximated.append(approx_quad)
