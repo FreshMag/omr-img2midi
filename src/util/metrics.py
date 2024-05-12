@@ -46,7 +46,6 @@ def symbol_error_rate(pred, ref):
 def jaccard_index(ref, pred):
     intersection = len(list(set(pred).intersection(ref)))
     union = (len(pred) + len(ref)) - intersection
-    # print("Length Prediction: %d\nLength Reference: %d" % (len(pred),len(ref)))
     return float(intersection) / union
 
 
@@ -85,7 +84,6 @@ def get_test_set(directory, filter_files=None):
                 test_set[name]["ref"] = ref_file_path
             else:
                 warnings.warn("Could not find reference file for %s" % name)
-                # raise FileNotFoundError("Could not find reference file for %s" % name)
 
     return test_set
 
@@ -109,7 +107,6 @@ def print_statistics(results, conditions):
                                 results[name]["ref-" + condition + "-symbolerror"],
                                 results[name]["scan-" + condition + "-symbolerror"]])
 
-    # print(results)
     print(tabulate.tabulate(to_tabulate, headers=["Name of the sheet", "Jaccard Index(with reference)",
                                                   "Jaccard Index(with scanned)", "Symbol Error Rate(with reference)",
                                                   "Symbol Error Rate(with scanned)"], tablefmt="fancy_grid"))
@@ -175,13 +172,11 @@ def test_set_with_metrics(parameters, directory="./", vocabulary_file_path="../.
             cv2.waitKey(0)
             cv2.destroyAllWindows()
         segments = segment_doc(img)
-        #for segment in segments:
-        #show_image(segment)
         sheet, _ = end2end_recognition(segments, model=model, vocabulary_path=vocabulary_file_path)
         return sheet
 
     cameras = ["front", "left", "right", "top", "bottom"]
-    backgrounds = ["normal", "shadow"]  # , "dark"]
+    backgrounds = ["normal", "shadow", "dark"]
     quality = ["-hd"]
     conditions = [comb[0] + comb[1] + comb[2] for comb in itertools.product(cameras, backgrounds, quality)]
     results = {}
@@ -200,7 +195,6 @@ def test_set_with_metrics(parameters, directory="./", vocabulary_file_path="../.
         # print("==== Calculating %s %s" % (name, "scan"))
         # print("==== Reference file: %s" % case["ref"])
         scanned = img2sheet(case["scan"], to_scan=False)
-        # scanned.write_to_file("../../data/output/%s.txt" % (os.path.basename(case["scan"])), output_format="symbol")
         results[name]["ref-scan-jaccard"] = jaccard_index(true.output_indexes, scanned.output_indexes)
         results[name]["ref-scan-symbolerror"] = symbol_error_rate(true.output_indexes, scanned.output_indexes)
 
@@ -210,7 +204,6 @@ def test_set_with_metrics(parameters, directory="./", vocabulary_file_path="../.
                 # print("==== Reference file: %s" % case["ref"])
 
                 computed_sheet = img2sheet(case[condition], to_scan=True)
-                # computed_sheet.write_to_file("../../data/output/%s.txt" % (os.path.basename(case[condition])), output_format="symbol")
                 results[name]["ref-" + condition + "-jaccard"] = jaccard_index(true.output_indexes,
                                                                                computed_sheet.output_indexes)
                 # print("==== Comparing with Scan image: %s" % case["scan"])
