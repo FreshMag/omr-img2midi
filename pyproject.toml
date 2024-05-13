@@ -51,7 +51,8 @@ dependencies = [
   "numpy~=1.26.4",
   "pylsd-nova~=1.2.1",
   "matplotlib>=3.7.1",
-  "tqdm"
+  "tqdm",
+  "antlr4-python3-runtime",
 ]
 
 [project.urls]
