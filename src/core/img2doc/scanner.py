@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from core.img2doc import imutils, transform
+from core.img2doc import imgutils, transform
 from core.img2doc.contours import approx_contours, harris
 
 
@@ -41,7 +41,7 @@ def clean_image(warped, component_pixel_thresh_ratio, thresh_block_size_ratio, t
         return int(np.ceil(f) // 2 * 2 + 1)
 
     h, w, _ = warped.shape
-    thresh = imutils.warped2sharpened(warped, thresh_block_size=round_up_to_odd(thresh_block_size_ratio * w),
+    thresh = imgutils.warped2sharpened(warped, thresh_block_size=round_up_to_odd(thresh_block_size_ratio * w),
                                       thresh_c=int(thresh_c_ratio * w))
     n_labels, labels, stats, _ = cv2.connectedComponentsWithStats(cv2.bitwise_not(thresh), None, None,
                                                                   None, 8, cv2.CV_32S)
@@ -61,7 +61,7 @@ def warp_image(image, max_quad_angle_range, min_quad_area_ratio, ratio, rescaled
     :return: the warped image
     """
     orig = image.copy()
-    rescaled_image = imutils.resize(image, height=int(rescaled_height))
+    rescaled_image = imgutils.resize(image, height=int(rescaled_height))
     quad, contour_found = approx_contours(rescaled_image, min_quad_area_ratio, max_quad_angle_range)
     if not contour_found:
         # if contour method didn't work we try harris method
