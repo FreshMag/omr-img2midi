@@ -1,7 +1,7 @@
 import os
 import warnings
 
-from src.semantic.parser import parse
+from semantic.parser import parse
 
 
 class EncodedSheet:
