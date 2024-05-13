@@ -16,7 +16,8 @@ import cv2
 import tabulate
 from core.doc2segments.segmentation import segment_doc
 from core.img2doc.scanner import scan, light_scan
-from semantic import EncodedSheet, CTC
+from semantic.sheet import EncodedSheet
+from semantic.end2end.ctc_predict import CTC
 from util.one_pass import end2end_recognition
 
 

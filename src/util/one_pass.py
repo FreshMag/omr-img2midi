@@ -1,4 +1,4 @@
-from semantic import EncodedSheet
+from semantic.sheet import EncodedSheet
 
 
 def end2end_recognition(segments, model, vocabulary_path=None):
