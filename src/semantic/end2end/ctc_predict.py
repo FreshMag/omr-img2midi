@@ -8,11 +8,9 @@
 
 """
 
-import tensorflow as tf
-from semantic.ctc_utils import normalize, resize, sparse_tensor_to_strs
-import cv2
 import numpy as np
-
+import tensorflow as tf
+from semantic.end2end.ctc_utils import normalize, resize, sparse_tensor_to_strs
 
 """
 Disables eager execution: introduced after script conversion using tf_upgrade_v2 script 
