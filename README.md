@@ -10,7 +10,7 @@ the details about how the model was originally trained and created.
 The original code has been deeply extended and modified, adding much more functionalities described in the report.
 
 ## Usage
-The two parts of the projects can be tested using the corresponding notebooks `omr.ipynb` and `Staff_Removal.ipynb`
+The two parts of the projects can be tested using the corresponding notebooks `AE2E.ipynb` and `Staff_Removal.ipynb`
 
 ## Citations
 
