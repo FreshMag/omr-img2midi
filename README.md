@@ -1,5 +1,13 @@
 # Optical Music Recognition (img2midi)
 
+Staff Removal: <a target="_blank" href="https://colab.research.google.com/github/FreshMag/omr-img2midi/blob/master/Staff_Removal.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
+End-To-End: <a target="_blank" href="https://colab.research.google.com/github/FreshMag/omr-img2midi/blob/master/AE2E.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 Computer vision project where different algorithms and methodologies of Optical Music Recognition are studied and implemented.
 
 This repository is a fork of the [original project by Calvo-Zaragoza](https://github.com/OMR-Research/tf-end-to-end) that
